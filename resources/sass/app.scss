@@ -1,0 +1,559 @@
+// Fonts
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;800&display=swap");
+
+@import "~vuetify/dist/vuetify.min.css";
+
+// Variables
+@import "variables";
+
+// Bootstrap
+@import "~bootstrap/scss/bootstrap";
+
+//Vuetify
+@import "vuetify-bugs";
+
+// Mdi icons
+@import url("https://fonts.googleapis.com/css?family=Material+Icons");
+@import url("https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900");
+@import url("https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
+
+//CSS Animations
+@import url("https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css");
+@import "normalize";
+
+* {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    appearance: none;
+    border: 0;
+    text-decoration: none;
+    list-style: none;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 14px;
+}
+
+body {
+    width: 100vw;
+    height: 99vh;
+    font-family: poppins, sans-serif;
+    font-size: 0.88rem;
+    background-color: $color-background;
+    user-select: none;
+    // overflow-x: hidden;
+    z-index: 0;
+    min-height: 100vh;
+}
+
+.app-container {
+    display: grid;
+    margin: 0 auto;
+    width: 100% !important;
+    font-family: poppins, sans-serif;
+    font-size: 0.88rem;
+    background: $color-background;
+    height: 100vh;
+    gap: 1.8rem;
+
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    // grid-template-columns: 14rem auto;
+}
+
+a {
+    color: $color-dark;
+}
+
+img {
+    display: block;
+    width: 100%;
+}
+
+h1 {
+    font-weight: 808;
+    font-size: 1.8rem;
+}
+
+h2 {
+    font-size: 1.4rem;
+}
+
+h3 {
+    font-size: 0.87rem;
+}
+
+h4 {
+    font-size: 0.8rem;
+}
+
+h5 {
+    font-size: 0.77rem;
+}
+
+small {
+    font-size: 0.75rem;
+}
+
+.profile-photo {
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.text-muted {
+    color: $color-info-dark;
+}
+
+p {
+    color: $color-dark-variant;
+}
+
+b {
+    color: $color-dark;
+}
+
+.primary {
+    color: $color-primary;
+}
+
+.danger {
+    color: $color-danger;
+}
+
+.success {
+    color: $color-success;
+}
+
+.warning {
+    color: $color-warning;
+}
+
+// Sidebar
+aside {
+    display: st;
+    height: 100vh;
+    z-index: 999;
+    width: 18rem;
+    background-color: $white;
+    margin: 0;
+    position: absolute;
+    left: -18rem;
+    box-shadow: $box-shadow;
+    border: $card-border-width solid $card-border-color;
+}
+
+aside.active {
+    left: 0rem;
+    position: fixed;
+}
+
+aside .top {
+    // background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.4rem;
+}
+
+aside .logo {
+    display: flex;
+    gap: 0.8rem;
+}
+
+aside .logo img {
+    width: 100%;
+    display: flex;
+    // height: 6vh;
+    margin-left: 1.5rem;
+}
+
+aside .close {
+    // display: none;
+    margin-right: 1rem;
+}
+
+aside .close a span {
+    // display: none;
+    margin-right: 1rem;
+    font-size: 2rem;
+}
+
+aside .sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 84vh;
+    position: relative;
+    top: 1rem;
+    // overflow: scroll;
+}
+
+aside h3 {
+    font-weight: 500;
+    box-shadow: $box-shadow;
+}
+
+aside .sidebar a {
+    display: flex;
+    color: $color-info-dark;
+    margin: 0.3rem;
+    gap: 1rem;
+    align-items: center;
+    position: relative;
+    height: 3rem;
+    transition: all 300ms ease;
+}
+
+.sidebar .header {
+    display: flex;
+    color: $color-info-dark;
+    margin: 0.3rem 0 0.3rem 0.8rem;
+    gap: 1rem;
+    align-items: center;
+    position: relative;
+    height: 3rem;
+    // transition: all 300ms ease;
+    justify-content: space-between;
+    margin-right: 0.5rem;
+}
+
+.sidebar .header span {
+    display: flex;
+    align-items: center;
+    margin: 0.3rem 0 0.3rem 0.5rem;
+    gap: 1rem;
+}
+
+.sidebar .header span:hover {
+    display: flex;
+    align-items: center;
+    // margin: 0.3rem 0 0.3rem 0.5rem;
+    gap: 1rem;
+}
+
+
+.sidebar .header:hover {
+    color: $color-primary;
+    // margin: 0.3rem 0 0.3rem 0.5rem;
+}
+
+aside .sidebar a span {
+    font-size: 1.6rem;
+    margin-left: 1.5rem;
+}
+
+aside .sidebar a h3 {
+    margin-top: 0.3rem;
+}
+
+aside .sidebar a.last-child {
+    position: absolute;
+    bottom: 2rem;
+    width: 100%;
+}
+
+aside .sidebar a.active {
+    background: $color-light;
+    color: $color-primary;
+    margin-left: 0;
+}
+
+aside .sidebar a.active:before {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 100%;
+    background: $color-primary;
+}
+
+aside .sidebar span {
+    color: $color-primary;
+    margin-left: calc(1rem - 3px);
+}
+
+aside .sidebar a:hover {
+    color: $color-primary;
+}
+
+// aside .sidebar a:hover span {
+//     // margin-left: 1.4rem;
+//     // transition: all 300ms linear;
+// }
+
+// Multiple options
+.submenu {
+    // display: flex;
+    // margin-left: 0rem;
+    // gap: 1rem;
+    // overflow: hidden;
+    position: relative;
+    left: 18rem;
+    height: 1rem;
+    background: $color-light;
+    width: 12rem !important;
+    top: -4rem;
+    padding: 0.5rem;
+    height: 90%;
+    display: none;
+}
+
+// .header:hover {
+//     display: block;
+// }
+
+.submenu a {
+    display: flex;
+    position: relative;
+    left: 0rem;
+    gap: 1rem;
+    overflow: hidden;
+    height: 2rem !important;
+    padding-left: 3rem !important;
+}
+
+// Navbar
+
+nav {
+    height: 6rem;
+    // position: absolute;
+    top: 0;
+    width: 100vw;
+    position: fixed;
+    background: $white;
+    box-shadow: $box-shadow;
+    border: $card-border-width solid $card-border-color;
+    z-index: 999;
+}
+
+nav .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0 2.5rem;
+    padding: 0;
+}
+
+nav .navbar .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 6rem;
+}
+
+nav .navbar .nav-right {
+    display: flex;
+    align-items: center;
+    margin-right: 0;
+    gap: 1rem;
+    height: 6rem;
+}
+
+nav .navbar .nav-right .user a {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+nav .navbar .nav-right .user a img {
+    width: 2.0rem;
+    height: 2.0rem;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+nav .navbar .nav-left .menu span {
+    font-size: 2.5rem;
+    margin-left: 1rem;
+}
+
+// Main
+main {
+    width: 100%;
+    flex: 1;
+    margin-top: 7rem;
+    z-index: 1;
+}
+
+main h1 {
+    align-items: left;
+}
+
+// Footer
+footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 6rem;
+    color: $color-dark;
+    // font-size: 1.2rem;
+    // font-weight: 500;
+    bottom: 0;
+    background: $white;
+    border-radius: 0.6rem;
+    box-shadow: 3rem $color-light;
+    ;
+    width: 96vw;
+    margin: 0 1rem;
+}
+
+main,
+footer {
+    flex-shrink: 0;
+}
+
+footer h5 {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+//Dropdown
+.dropdown-list {
+    position: absolute;
+    width: 35vh;
+    right: 0.5rem;
+    margin-top: 0.4rem;
+    padding: 0.8rem;
+    background: $white;
+    display: flex;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    top: 0;
+    display: none;
+}
+
+.dropdown-list.active {
+    transition: all 300ms ease-in-out;
+    top: 6rem;
+    right: 1.5rem;
+    display: block;
+}
+
+.dropdown-list ul li {
+    margin-left: 0.3rem;
+    width: 100%;
+    padding: 0.6rem;
+}
+
+.dropdown-list ul li a.option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+// .dropdown-list ul li .option:hover {
+//     cursor: pointer;
+//     background: $color-light;
+//     padding: 0.6rem;
+//     transition: all 400ms ease-in-out;
+//     border-radius: $border-radius;
+//     width: 100% !important;
+// }
+
+li.profile-nav {
+    padding-bottom: 0 !important;
+}
+
+.user li img {
+    width: auto;
+    height: 5rem;
+    border-radius: 10%;
+    overflow: hidden;
+}
+
+.user a {
+    padding: 0.4rem;
+    border-radius: $border-radius;
+}
+
+.user a:hover,
+.user a.activate {
+    background: $color-light;
+}
+
+.sidebar a:hover,
+a.btn-hover {
+    background: $color-light;
+    border-radius: $border-radius;
+    margin: 0.3rem 0;
+    transition: all 300ms ease-in-out;
+    overflow: hidden;
+}
+
+// .submenu a {
+//     color: $color-dark;
+//     position: relative;
+//     // position: absolute;
+//     // left: 2rem;
+//     width: 100%;
+//     // margin-left: 3rem;
+//     // color: $color-dark; // left: 18rem;
+// }
+
+// Bootstrap
+.card {
+    box-shadow: $box-shadow;
+}
+
+.btn-normal-forms,
+.btn-normal {
+    background: $color-primary  !important;
+    border: $card-border-width solid $card-border-color;
+    color: $white;
+    font-weight: 500;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul {
+    padding: 0;
+    list-style-type: none;
+    margin: 0;
+    background: $color-light;
+}
+
+ul::after {
+    content: "";
+    clear: both;
+    display: block;
+}
+
+.sub-menu li {
+    float: left;
+    position: relative;
+    width: 100%;
+}
+
+.sub-menu li a {
+    padding-left: 1.4rem;
+}
+
+.sub-menu {
+    display: none;
+}
+
+.dropdown-sidebar .sub-menu {
+    // position: relative;
+    left: 18rem;
+    display: none;
+    // z-index: 9999;
+    // top: -3.5rem;
+}
+
+.dropdown-sidebar:hover .sub-menu,
+.sub-menu:hover {
+    display: block;
+}

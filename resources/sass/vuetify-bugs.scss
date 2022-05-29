@@ -1,0 +1,46 @@
+/**
+ * Vuetify Inputs Bugs
+ *
+ * -------------------------------------------------------------------
+ */
+
+.v-text-field--outlined.v-input--dense .v-label {
+    top: 8px !important;
+    background-color: $white;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+    padding-bottom: 1rem;
+}
+
+.v-text-field--outlined.v-input--dense .v-label--active {
+    transform: translateY(-22px) scale(0.75);
+}
+
+.v-text-field--outlined .v-label--active {
+    transform: translateY(-29 px) scale(0.75) !important;
+    background-color: $white;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+}
+
+.v-textarea.v-text-field--enclosed.v-text-field--outlined:not(.v-input--dense) .v-label {
+    top: 10px !important;
+}
+
+.v-text-field__details {
+    display: none !important;
+}
+
+.v-messages {
+    display: none !important;
+}
+
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px $white inset !important;
+}
+
+.theme--light.v-text-field--outlined>.v-input__control>.v-input__slot fieldset {
+    border-color: $color-primary  !important;
+}
