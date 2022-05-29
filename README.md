@@ -1,6 +1,6 @@
 <!-- <p align="center"><a href="https://laravel.com" target="_blank"><img src="" width="400"></a></p> -->
 
-# MC Framework
+# Alpha Framework
 
 Proyecto de desarrollo base para Alpha Systems
 
