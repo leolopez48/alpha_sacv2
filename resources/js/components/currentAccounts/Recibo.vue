@@ -114,7 +114,7 @@
                     <!-- Apellidos -->
                     <v-col cols="12" sm="12" md="6">
                       <base-input
-                        label="Nombre"
+                        label="Apellidos"
                         :validation="$v.editedItem.apellidos"
                         validationTextType="default"
                         v-model="$v.editedItem.apellidos.$model"
@@ -127,11 +127,11 @@
                     </v-col>
                     <!-- Apellidos -->
                     <!-- Direccion -->
-                    <v-col cols="12" sm="12" md="6">
+                    <v-col cols="12" sm="12" md="12">
                       <base-input
-                        label="Minúsculas"
-                        v-model="$v.editedItem.dui.$model"
-                        :validation="$v.editedItem.dui"
+                        label="Dirección"
+                        v-model="$v.editedItem.direccion.$model"
+                        :validation="$v.editedItem.direccion"
                         validationTextType="default"
                         :validationsInput="{
                           required: true,
@@ -145,8 +145,8 @@
                     <v-col cols="12" sm="12" md="12">
                       <base-input
                         label="Concepto"
-                        v-model="$v.editedItem.apellidos.$model"
-                        :validation="$v.editedItem.apellidos"
+                        v-model="$v.editedItem.concepto.$model"
+                        :validation="$v.editedItem.concepto"
                         validationTextType="default"
                         :validationsInput="{
                           required: true,
@@ -157,33 +157,9 @@
                     </v-col>
                     <!-- Concepto -->
 
-                    <table>
-                      <thead>
-                        <th>Código</th>
-                        <th>Nombre</th>
-                        <th>Valor</th>
-                        <th>Cantidad</th>
-                        <th>Total</th>
-                      </thead>
-                      <tbody></tbody>
-                    </table>
-
-                    <!-- Total -->
-                    <v-col cols="12" sm="12" md="6">
-                      <base-input
-                        label="Total"
-                        v-model="$v.editedItem.apellidos.$model"
-                        :validation="$v.editedItem.apellidos"
-                        validationTextType="default"
-                        :readonly="true"
-                        :validationsInput="{
-                          required: true,
-                          minLength: true,
-                          maxLength: true,
-                        }"
-                      />
-                    </v-col>
-                    <!-- Total -->
+                    <hr />
+                    <h2>Detalles</h2>
+                    <add-accounts />
                   </v-row>
                   <!-- Form -->
                   <v-row>
@@ -259,8 +235,10 @@ import reciboApi from "../../apis/reciboApi";
 import cuentaApi from "../../apis/cuentaApi";
 import lib from "../../libs/function";
 import { required, minLength, maxLength } from "vuelidate/lib/validators";
+import AddAccounts from "./AddAccounts.vue";
 
 export default {
+  components: { AddAccounts },
   data: () => ({
     search: "",
     dialog: false,
@@ -281,18 +259,20 @@ export default {
       dui: "",
       nombres: "",
       apellidos: "",
-      direccion: "",
+      direccion: "EL PARAISO",
       concepto: "",
       total: "",
+      details_receipts: [],
     },
     defaultItem: {
       fecha_registro: "",
       dui: "",
       nombres: "",
       apellidos: "",
-      direccion: "",
+      direccion: "EL PARAISO",
       concepto: "",
       total: "",
+      details_receipts: [],
     },
     textAlert: "",
     alertEvent: "success",
