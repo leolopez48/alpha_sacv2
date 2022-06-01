@@ -4,13 +4,13 @@
       :redirect="redirectSessionFinished"
       @redirect="updateTimeOut($event)"
     />
-    <alert
+    <!-- <alert
       :text="textAlert"
       :event="alertEvent"
       :show="showAlert"
       @show-alert="updateAlert($event)"
       class="mb-2"
-    />
+    /> -->
     <v-data-table
       :headers="headers"
       :items="recordsFiltered"
@@ -75,7 +75,6 @@
                         :validationsInput="{
                           required: true,
                           minLength: true,
-                          maxLength: true,
                         }"
                       />
                     </v-col>
@@ -88,13 +87,12 @@
                         validationTextType="only-numbers"
                         v-mask="'########-#'"
                         v-model="$v.editedItem.dui.$model"
-                        :validationsInput="{
-                          required: true,
-                          minLength: true,
-                          maxLength: true,
-                        }"
+                        :validationsInput="{}"
                       />
                     </v-col>
+                    <!-- required: true,
+                          minLength: true,
+                          maxLength: true, -->
                     <!-- DUI -->
                     <!-- Nombres -->
                     <v-col cols="12" sm="12" md="6">
@@ -159,7 +157,7 @@
 
                     <hr />
                     <h2>Detalles</h2>
-                    <add-accounts />
+                    <add-accounts @add-new-detail="updateReceipts($event)" />
                   </v-row>
                   <!-- Form -->
                   <v-row>
@@ -236,6 +234,7 @@ import cuentaApi from "../../apis/cuentaApi";
 import lib from "../../libs/function";
 import { required, minLength, maxLength } from "vuelidate/lib/validators";
 import AddAccounts from "./AddAccounts.vue";
+import moment from "moment";
 
 export default {
   components: { AddAccounts },
@@ -255,22 +254,22 @@ export default {
     recordsFiltered: [],
     editedIndex: -1,
     editedItem: {
-      fecha_registro: "",
-      dui: "",
-      nombres: "",
-      apellidos: "",
+      fecha_registro: moment().format("YYYY-MM-DD"),
+      dui: "05404005-2",
+      nombres: "Leonel Antonio",
+      apellidos: "López Valencia",
       direccion: "EL PARAISO",
-      concepto: "",
+      concepto: "POR 1 EEE",
       total: "",
       details_receipts: [],
     },
     defaultItem: {
-      fecha_registro: "",
-      dui: "",
-      nombres: "",
-      apellidos: "",
+      fecha_registro: moment().format("YYYY-MM-DD"),
+      dui: "05404005-2",
+      nombres: "Leonel Antonio",
+      apellidos: "López Valencia",
       direccion: "EL PARAISO",
-      concepto: "",
+      concepto: "POR 1 EEE",
       total: "",
       details_receipts: [],
     },
@@ -290,9 +289,9 @@ export default {
         minLength: minLength(1),
       },
       dui: {
-        required,
-        minLength: minLength(1),
-        maxLength: maxLength(150),
+        // required,
+        // minLength: minLength(1),
+        // maxLength: maxLength(150),
       },
       nombres: {
         required,
@@ -348,11 +347,11 @@ export default {
       let requests = [reciboApi.get(), cuentaApi.get()];
 
       const res = await Promise.all(requests).catch((error) => {
-        this.updateAlert(true, "No fue posible obtener los registros.", "fail");
-        this.redirectSessionFinished = lib.verifySessionFinished(
-          error.response.status,
-          401
-        );
+        // this.updateAlert(true, "No fue posible obtener los registros.", "fail");
+        // this.redirectSessionFinished = lib.verifySessionFinished(
+        //   error.response.status,
+        //   401
+        // );
       });
 
       this.records = res[0].data.recibos;
@@ -377,11 +376,11 @@ export default {
       const res = await reciboApi
         .delete(`/${this.editedItem.id}`)
         .catch((error) => {
-          this.updateAlert(
-            true,
-            "No fue posible eliminar el registros.",
-            "fail"
-          );
+          //   this.updateAlert(
+          //     true,
+          //     "No fue posible eliminar el registros.",
+          //     "fail"
+          //   );
           this.close();
           this.redirectSessionFinished = lib.verifySessionFinished(
             error.response.status,
@@ -394,7 +393,7 @@ export default {
           res.status,
           200
         );
-        this.updateAlert(true, "Registro eliminado.", "success");
+        // this.updateAlert(true, "Registro eliminado.", "success");
       }
 
       this.initialize();
@@ -420,9 +419,11 @@ export default {
     async save() {
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.updateAlert(true, "Campos obligatorios.", "fail");
+        console.log("Error");
+        // this.updateAlert(true, "Campos obligatorios.", "fail");
         return;
       }
+      console.log("Good");
 
       if (this.editedIndex > -1) {
         const edited = Object.assign(
@@ -433,11 +434,11 @@ export default {
         const res = await reciboApi
           .put(`/${this.editedItem.id}`, this.editedItem)
           .catch((error) => {
-            this.updateAlert(
-              true,
-              "No fue posible actualizar el registro.",
-              "fail"
-            );
+            // this.updateAlert(
+            //   true,
+            //   "No fue posible actualizar el registro.",
+            //   "fail"
+            // );
 
             this.redirectSessionFinished = lib.verifySessionFinished(
               error.response.status,
@@ -450,13 +451,13 @@ export default {
             res.status,
             200
           );
-          this.updateAlert(true, "Registro actualizado.", "success");
+          //   this.updateAlert(true, "Registro actualizado.", "success");
         }
       } else {
         const res = await reciboApi
           .post(null, this.editedItem)
           .catch((error) => {
-            this.updateAlert(true, "No fue posible crear el registro.", "fail");
+            // this.updateAlert(true, "No fue posible crear el registro.", "fail");
             this.close();
             this.redirectSessionFinished = lib.verifySessionFinished(
               error.response.status,
@@ -469,11 +470,11 @@ export default {
             res.status,
             200
           );
-          this.updateAlert(
-            true,
-            "Registro almacenado correctamente.",
-            "success"
-          );
+          //   this.updateAlert(
+          //     true,
+          //     "Registro almacenado correctamente.",
+          //     "success"
+          //   );
         }
       }
 
@@ -502,6 +503,12 @@ export default {
       }
 
       this.recordsFiltered = this.records;
+    },
+
+    updateReceipts(event) {
+      //   console.log(event);
+      this.editedItem.details_receipts = event.receipts;
+      this.editedItem.total = event.total;
     },
 
     updateAlert(show = false, text = "Alerta", event = "success") {

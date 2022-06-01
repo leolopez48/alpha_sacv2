@@ -16,7 +16,7 @@ class CreateDetallesReciboTable extends Migration
         Schema::create('detalles_recibo', function (Blueprint $table) {
             $table->integer('id', true);
             $table->integer('recibo_id')->index('fk_detalles_recibo_recibo1_idx');
-            $table->integer('cuenta_id')->index('fk_detalles_recibo_cuenta1_idx');
+            $table->integer('cuenta_id')->index('fk_detalles_recibo_cuenta1_idx')->nullable();
             $table->double('cantidad')->nullable();
             $table->double('subtotal')->nullable();
             $table->softDeletes();

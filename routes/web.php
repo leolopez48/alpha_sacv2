@@ -60,6 +60,7 @@ Route::group(['middleware'=> ['auth', 'verified', 'throttle:web']], function () 
 
     Route::get('generateCheck/{id}', [PDFController::class, 'generateCheck']);
     Route::get('generateSummary/{id}', [PDFController::class, 'generateSummary']);
+    Route::get('downloadReceipt/{id}', [ReciboController::class, 'downloadReceipt']);
 
     // Cheques
     Route::resource('api/supplier', SupplierController::class);

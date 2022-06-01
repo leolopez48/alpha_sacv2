@@ -15,7 +15,7 @@ class CreateReciboTable extends Migration
     {
         Schema::create('recibo', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->dateTime('fecha_registro')->nullable();
+            $table->date('fecha_registro')->nullable();
             $table->string('dui', 25)->nullable();
             $table->string('nombres', 100)->nullable();
             $table->string('apellidos', 100)->nullable();

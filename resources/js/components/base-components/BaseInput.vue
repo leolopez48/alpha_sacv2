@@ -28,13 +28,13 @@
         {{ icon }}
       </v-icon>
     </v-text-field>
-    <v-container class="mb-0 pt-0 my-auto orange-text" v-if="validation.$dirty">
+    <v-container class="mb-0 pt-0 my-auto orange-text">
       <template v-if="!validationsInput.required">
         <v-row class="pt-0" v-if="!validationsInput.required">
           <p class="mb-0 mt-1 text-muted">(Campo opcional)</p>
         </v-row>
       </template>
-      <template>
+      <template v-if="validation.$dirty">
         <v-row
           v-if="validation.$error && validationsInput.required"
           class="pt-0"

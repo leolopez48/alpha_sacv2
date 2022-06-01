@@ -6,22 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Recibo extends Model
+class DetalleRecibo extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'recibo';
+    protected $table = 'detalles_recibo';
 
     public $incrementing = true;
 
     protected $fillable = [
-        'fecha_registro',
-        'dui',
-        'nombres',
-        'apellidos',
-        'concepto',
-        'total',
-        'direccion'
+        'recibo_id',
+        'cuenta_id',
+        'cantidad',
+        'subtotal',
     ];
 
     protected $data = ['deleted_at'];

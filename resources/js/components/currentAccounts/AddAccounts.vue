@@ -140,8 +140,6 @@ export default {
         return;
       }
 
-      //   this.total = 0;
-
       this.accounts.filter((account) => {
         if (account.nombre_cuenta == this.newDetail.nombre_cuenta) {
           this.newDetail.valor = account.valor;
@@ -153,8 +151,9 @@ export default {
             let fiesta = {
               nombre_cuenta: `FIESTA - ${account.nombre_cuenta}`,
               valor: this.fiesta,
-              cantidad: 1,
-              subtotal: this.newDetail.subtotal * this.fiesta,
+              cantidad: this.newDetail.cantidad,
+              subtotal:
+                parseFloat(this.newDetail.subtotal).toFixed(2) * this.fiesta,
             };
 
             this.details_receipts.push(fiesta);
@@ -168,6 +167,11 @@ export default {
       this.details_receipts.push(this.newDetail);
       this.$v.$reset();
       this.newDetail = this.newDetailDefault;
+
+      this.$emit("add-new-detail", {
+        receipts: this.details_receipts,
+        total: this.total,
+      });
     },
 
     deleteDetail(index) {
