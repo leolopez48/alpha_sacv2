@@ -61,6 +61,7 @@ Route::group(['middleware'=> ['auth', 'verified', 'throttle:web']], function () 
     Route::get('generateCheck/{id}', [PDFController::class, 'generateCheck']);
     Route::get('generateSummary/{id}', [PDFController::class, 'generateSummary']);
     Route::get('downloadReceipt/{id}', [ReciboController::class, 'downloadReceipt']);
+    Route::get('reportByDate', [ReciboController::class, 'downloadReportByDate']);
 
     // Cheques
     Route::resource('api/supplier', SupplierController::class);
@@ -106,6 +107,10 @@ Route::group(['middleware'=> ['auth', 'verified', 'throttle:web']], function () 
 
     Route::get('/accounts', function () {
         return view('currentAccounts.account.index');
+    });
+
+    Route::get('/reportTributes', function () {
+        return view('currentAccounts.recibo.reportTributes');
     });
 
 

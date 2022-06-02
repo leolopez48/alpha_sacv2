@@ -43,8 +43,8 @@
         <th>Total</th>
         <th>Acciones</th>
       </thead>
-      <tbody v-if="details_receipts.length > 0">
-        <tr v-for="(detail, index) in details_receipts" :key="index">
+      <tbody v-if="editedItem.detail_receipts.length > 0">
+        <tr v-for="(detail, index) in editedItem.detail_receipts" :key="index">
           <td>{{ detail.nombre_cuenta }}</td>
           <td>{{ detail.valor }}</td>
           <td>{{ detail.cantidad }}</td>
@@ -76,7 +76,6 @@ import { required, minLength, maxLength } from "vuelidate/lib/validators";
 export default {
   data: () => ({
     accounts: [],
-    details_receipts: [],
     newDetail: {
       nombre_cuenta: "",
       valor: 0.0,
@@ -93,6 +92,15 @@ export default {
     total: 0.0,
   }),
 
+  props: {
+    editedItem: {
+      type: Object,
+      default: () => ({
+        detail_receipts: [],
+      }),
+    },
+  },
+
   validations: {
     newDetail: {
       nombre_cuenta: {
@@ -108,6 +116,23 @@ export default {
     },
   },
 
+  watch: {
+    editedItem(val) {
+      this.total = 0.0;
+      val.detail_receipts.forEach((detail) => {
+        this.total += detail.subtotal;
+        // console.log(this.total);
+      });
+    },
+  },
+
+  created() {
+    this.total = 0.0;
+    this.editedItem.detail_receipts.forEach((detail) => {
+      this.total += detail.subtotal;
+    });
+  },
+
   mounted() {
     this.initialize();
   },
@@ -120,6 +145,8 @@ export default {
     async initialize() {
       this.records = [];
       this.recordsFiltered = [];
+
+      console.log("Hola, ", this.editedItem);
 
       let requests = [cuentaApi.get()];
 
@@ -149,14 +176,14 @@ export default {
 
           if (account.apply_parties == 1) {
             let fiesta = {
-              nombre_cuenta: `FIESTA - ${account.nombre_cuenta}`,
+              nombre_cuenta: `FIESTA`,
               valor: this.fiesta,
               cantidad: this.newDetail.cantidad,
               subtotal:
                 parseFloat(this.newDetail.subtotal).toFixed(2) * this.fiesta,
             };
 
-            this.details_receipts.push(fiesta);
+            this.editedItem.detail_receipts.push(fiesta);
             this.total += fiesta.subtotal;
           }
 
@@ -164,20 +191,20 @@ export default {
         }
       });
 
-      this.details_receipts.push(this.newDetail);
+      this.editedItem.detail_receipts.push(this.newDetail);
       this.$v.$reset();
       this.newDetail = this.newDetailDefault;
 
       this.$emit("add-new-detail", {
-        receipts: this.details_receipts,
+        receipts: this.editedItem.detail_receipts,
         total: this.total,
       });
     },
 
     deleteDetail(index) {
-      this.total -= this.details_receipts[index].subtotal;
+      this.total -= this.editedItem.detail_receipts[index].subtotal;
 
-      this.details_receipts.splice(index, 1);
+      this.editedItem.detail_receipts.splice(index, 1);
     },
 
     amountFormat() {

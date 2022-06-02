@@ -14,7 +14,15 @@
     <v-data-table
       :headers="headers"
       :items="recordsFiltered"
-      sort-by="id"
+      :search="search"
+      :options.sync="options"
+      :server-items-length="total"
+      :footer-props="{ itemsPerPageOptions: [50] }"
+      :items-per-page="take"
+      @update:options="updatePagination"
+      :page.sync="actualPage"
+      item-key="id"
+      sort-by="name"
       class="elevation-3 shadow p-3 mt-3"
     >
       <template v-slot:top>
@@ -30,7 +38,10 @@
                     v-bind="attrs"
                     v-on="on"
                     rounded
-                    @click="$v.editedItem.$reset()"
+                    @click="
+                      $v.editedItem.$reset();
+                      editedItem = defaultItem;
+                    "
                   >
                     Agregar
                   </v-btn>
@@ -157,7 +168,10 @@
 
                     <hr />
                     <h2>Detalles</h2>
-                    <add-accounts @add-new-detail="updateReceipts($event)" />
+                    <add-accounts
+                      :editedItem="editedItem"
+                      @add-new-detail="updateReceipts($event)"
+                    />
                   </v-row>
                   <!-- Form -->
                   <v-row>
@@ -212,8 +226,15 @@
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
-        <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+        <v-icon small class="mr-2" @click="editItem(item)" title="Editar">
+          mdi-pencil
+        </v-icon>
+        <v-icon small class="mr-2" @click="deleteItem(item)" title="Eliminar">
+          mdi-delete
+        </v-icon>
+        <v-icon small @click="printReceipt(item)" title="Imprimir">
+          mdi-printer
+        </v-icon>
       </template>
       <template v-slot:no-data>
         <a
@@ -261,7 +282,7 @@ export default {
       direccion: "EL PARAISO",
       concepto: "POR 1 EEE",
       total: "",
-      details_receipts: [],
+      detail_receipts: [],
     },
     defaultItem: {
       fecha_registro: moment().format("YYYY-MM-DD"),
@@ -271,7 +292,7 @@ export default {
       direccion: "EL PARAISO",
       concepto: "POR 1 EEE",
       total: "",
-      details_receipts: [],
+      detail_receipts: [],
     },
     textAlert: "",
     alertEvent: "success",
@@ -279,7 +300,31 @@ export default {
     redirectSessionFinished: false,
     alertTimeOut: 0,
     accounts: [],
+    options: {},
+    numberItemsToAdd: 50,
+    total: 50,
+    loadMoreItems: false,
+    options: {},
+    actualPage: 1,
+    skip: 0,
+    take: 50,
   }),
+
+  watch: {
+    options: {
+      handler() {
+        this.loadMore();
+      },
+      deep: false,
+      dirty: false,
+    },
+    dialog(val) {
+      val || this.close();
+    },
+    dialogBlock(val) {
+      val || this.closeBlock();
+    },
+  },
 
   //Validations
   validations: {
@@ -344,7 +389,12 @@ export default {
       this.records = [];
       this.recordsFiltered = [];
 
-      let requests = [reciboApi.get(), cuentaApi.get()];
+      let requests = [
+        reciboApi.get(null, {
+          params: { skip: this.skip, take: this.take },
+        }),
+        cuentaApi.get(),
+      ];
 
       const res = await Promise.all(requests).catch((error) => {
         // this.updateAlert(true, "No fue posible obtener los registros.", "fail");
@@ -423,7 +473,7 @@ export default {
         // this.updateAlert(true, "Campos obligatorios.", "fail");
         return;
       }
-      console.log("Good");
+      //   console.log("Good");
 
       if (this.editedIndex > -1) {
         const edited = Object.assign(
@@ -506,9 +556,15 @@ export default {
     },
 
     updateReceipts(event) {
-      //   console.log(event);
-      this.editedItem.details_receipts = event.receipts;
+      this.editedItem.detail_receipts = event.receipts;
       this.editedItem.total = event.total;
+    },
+
+    printReceipt(item) {
+      //   this.editedItem = Object.assign({}, item);
+      //   this.dialogPrint = true;
+      //   console.log(item);
+      window.open(`/downloadReceipt/${item.id}`);
     },
 
     updateAlert(show = false, text = "Alerta", event = "success") {
@@ -519,6 +575,52 @@ export default {
 
     updateTimeOut(event) {
       this.redirectSessionFinished = event;
+    },
+
+    async loadMore() {
+      if (this.actualPage == 1) {
+        this.actualPage = 1;
+        this.skip = 0;
+        this.take = this.numberItemsToAdd;
+      }
+      const res = await reciboApi
+        .get(null, {
+          params: { skip: this.skip, take: this.take },
+        })
+        .catch((error) => {
+          this.redirectSessionFinished = lib.verifySessionFinished(
+            res.status,
+            200
+          );
+          this.updateAlert(
+            true,
+            "Registro almacenado correctamente.",
+            "success"
+          );
+        });
+
+      this.records = res.data.users;
+      this.recordsFiltered = res.data.users;
+
+      this.search = "";
+
+      this.$v.editedItem.rol.$model = "Postulante";
+    },
+
+    updatePagination(pagination) {
+      if (pagination.page != 1) {
+        if (pagination.page <= this.actualPage) {
+          this.skip -= this.take;
+          this.take -= this.numberItemsToAdd;
+        } else {
+          this.skip = this.take;
+          this.take += this.numberItemsToAdd;
+        }
+      } else {
+        this.skip = 0;
+        this.take = this.numberItemsToAdd;
+      }
+      this.actualPage = pagination.page;
     },
   },
 };

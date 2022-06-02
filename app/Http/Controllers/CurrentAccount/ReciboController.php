@@ -9,6 +9,7 @@ use App\Models\CurrentAccount\Recibo;
 use Encrypt;
 use Illuminate\Http\Request;
 use Luecano\NumeroALetras\NumeroALetras;
+use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\TemplateProcessor;
 
 class ReciboController extends Controller
@@ -18,15 +19,38 @@ class ReciboController extends Controller
       *
       * @return \Illuminate\Http\Response
       */
-    public function index()
+    public function index(Request $request)
     {
-        $recibos = Recibo::all();
+        $skip = $request->skip;
+        $limit = $request->take - $skip; // the limit
+
+        $recibos = Recibo::skip($skip)->take($limit)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        foreach ($recibos as $recibo) {
+            // $recibo->nombre_cuenta = Cuenta::find($recibo->cuenta_id);
+            $recibo->detail_receipts = DetalleRecibo::where('recibo_id', $recibo->id)->get();
+
+            foreach ($recibo->detail_receipts as $detail) {
+                $account = Cuenta::where('id', $detail->cuenta_id)->first();
+
+                if (!empty($account)) {
+                    $detail->nombre_cuenta = $account->nombre_cuenta;
+                } else {
+                    $detail->nombre_cuenta = 'FIESTA';
+                }
+            }
+        }
         $recibos = Encrypt::encryptObject($recibos, 'id');
+
+        $total = Recibo::count();
 
         return response()->json([
             "status"=>"success",
             "message"=>"Registros obtenidos correctamente.",
-            'recibos'=>$recibos
+            'recibos'=>$recibos,
+            'total'=>$total
         ]);
     }
 
@@ -49,9 +73,8 @@ class ReciboController extends Controller
         ];
         $recibo = Recibo::create($data);
 
-        //insert detail_receipts
         $recibo_id = $recibo->id;
-        $details = $request->details_receipts;
+        $details = $request->detail_receipts;
         foreach ($details as $detail) {
             $data = [];
 
@@ -143,12 +166,11 @@ class ReciboController extends Controller
 
     public function downloadReceipt($id)
     {
+        $id = Encrypt::decryptValue($id);
+
         $receipts = Recibo::where("recibo.id", $id)->join('detalles_recibo', 'recibo.id', '=', 'detalles_recibo.recibo_id')
-        // ->join('cuenta', 'detalles_recibo.cuenta_id', '=', 'cuenta.id')
         ->select('recibo.*', 'detalles_recibo.*')
         ->get();
-
-        // dd($receipts);
 
         try {
             $formatter = new NumeroALetras();
@@ -197,9 +219,174 @@ class ReciboController extends Controller
                 'Content-Type: application/octet-stream',
             ];
 
-            return response()->download($tempFile, 'recibo.docx', $headers)->deleteFileAfterSend(true);
+            return response()->download($tempFile, "Recibo de ingreso $id.docx", $headers)->deleteFileAfterSend(true);
         } catch (\Throwable $th) {
             throw $th;
         }
+    }
+
+    //Use phpword to create a table
+    public function downloadReportByDate(Request $request)
+    {
+        $dateStart = $request->dateStart;
+        $dateEnd = $request->dateEnd;
+
+        $recibos = Recibo::where('fecha_registro', '>=', $dateStart)
+        ->where('fecha_registro', '<=', $dateEnd)
+        ->get();
+
+        //Create table
+        $document_with_table = new PhpWord();
+        $section = $document_with_table->addSection();
+        $table = $section->addTable('tableStyle');
+
+        $headers = [
+            'CODIGO',
+            'IMPUESTO',
+            'MONTO',
+        ];
+        $table->addRow();
+        for ($i = 0; $i < count($headers); $i++) {
+            $table->addCell(4000, [
+                'borderSize' => 6,
+                'bgColor' => '#e0e0e0',
+                ])
+            ->addTextRun([
+                'alignment' => 'center',
+                'spaceBefore' => 30,
+                'spaceAfter' => 30,
+            ])
+            ->addText($headers[$i], ['bold' => true]);
+        }
+
+        $accounts = Cuenta::all();
+        $total = 0;
+        // dd($accounts[0]);
+        for ($r = 0; $r < count($accounts); $r++) {
+            $table->addRow();
+            for ($c = 0; $c < count($headers); $c++) {
+                $width = 1200;
+                $text = "";
+                switch ($c) {
+                    case 0:
+                        $width = 4000;
+                        $text = $r+1;
+                    break;
+                    case 1:
+                        $width = 8000;
+                        $text = $accounts[$r]->nombre_cuenta;
+                        break;
+                    case 2:
+                        $width = 4000;
+                        $text .= "$ ";
+                        $subtotal = DetalleRecibo::where('cuenta_id', $accounts[$r]->id)->where('fecha_registro', '>=', $dateStart)
+                        ->where('fecha_registro', '<=', $dateEnd)
+                        ->join('recibo', 'recibo.id', '=', 'detalles_recibo.recibo_id')
+                        ->sum('subtotal');
+                        $text = $text.number_format($subtotal, 2);
+                        $total += $subtotal;
+                    break;
+                }
+                $table->addCell($width, [
+                    // 'borderStyle' => 'dotted',
+                    'borderSize' => 6
+                    ])
+                ->addTextRun([
+                    // 'alignment' => 'center',
+                    'spaceAfter' => 0,
+                    'spaceBefore' => 0,
+                ])
+                ->addText($text);
+            }
+        }
+
+        $table->addRow();
+        $table->addCell($width, [
+            // 'borderStyle' => 'dotted',
+            'borderSize' => 6
+            ])
+        ->addTextRun([
+            // 'alignment' => 'center',
+            'spaceAfter' => 0,
+            'spaceBefore' => 0,
+        ])
+        ->addText(count($accounts)+1);
+        $table->addCell($width, [
+            // 'borderStyle' => 'dotted',
+            'borderSize' => 6
+            ])
+        ->addTextRun([
+            // 'alignment' => 'center',
+            'spaceAfter' => 0,
+            'spaceBefore' => 0,
+        ])
+        ->addText("FIESTAS");
+
+        $fiestas = DetalleRecibo::where('cuenta_id', '=', null)->where('fecha_registro', '>=', $dateStart)
+        ->where('fecha_registro', '<=', $dateEnd)
+        ->join('recibo', 'recibo.id', '=', 'detalles_recibo.recibo_id')
+        ->sum('subtotal');
+        $total += $fiestas;
+        $table->addCell($width, [
+            // 'borderStyle' => 'dotted',
+            'borderSize' => 6
+            ])
+        ->addTextRun([
+            // 'alignment' => 'center',
+            'spaceAfter' => 0,
+            'spaceBefore' => 0,
+        ])
+        ->addText("$ ".number_format($fiestas, 2));
+
+        $table->addRow();
+        $table->addCell(4000, [
+            'borderSize' => 6,
+            'gridSpan' => 2,
+        ])
+        ->addTextRun([
+            'alignment' => 'center',
+            'spaceBefore' => 30,
+            'spaceAfter' => 30,
+            'bold' => true,
+        ])
+        ->addText("TOTAL DE INGRESOS", ['bold' => true]);
+
+        $table->addCell(4000, [
+            'borderSize' => 6,
+            'bgColor' => '#e0e0e0',
+        ])
+        ->addTextRun([
+            // 'alignment' => 'center',
+            'spaceBefore' => 30,
+            'spaceAfter' => 30,
+        ])
+        ->addText("$ ".number_format($total, 2), ['bold' => true]);
+
+        // Create writer to convert document to xml
+        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($document_with_table, 'Word2007');
+
+        // Get all document xml code
+        $fullxml = $objWriter->getWriterPart('Document')->write();
+
+        // Get only table xml code
+        $tablexml = preg_replace('/^[\s\S]*(<w:tbl\b.*<\/w:tbl>).*/', '$1', $fullxml);
+
+        //Open template with ${table}
+        $template_document = new \PhpOffice\PhpWord\TemplateProcessor(storage_path('reports/recibo_tributos.docx'));
+
+        // Replace mark by xml code of table
+        $template_document->setValue('table', $tablexml);
+        $template_document->setValue('dateStart', $dateStart);
+        $template_document->setValue('dateEnd', $dateEnd);
+
+        //save template with table
+        $tempFile = tempnam(sys_get_temp_dir(), 'PHPWord');
+        $template_document->saveAs($tempFile);
+
+        $headers = [
+            'Content-Type: application/octet-stream',
+        ];
+
+        return response()->download($tempFile, "Reporte de tributos.docx", $headers)->deleteFileAfterSend(true);
     }
 }

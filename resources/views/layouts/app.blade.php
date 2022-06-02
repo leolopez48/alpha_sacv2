@@ -46,35 +46,52 @@
             <div class="sidebar">
                 @auth
                     {{-- <a href="#" class="active option-menu"> --}}
-                    <a href="#" class="option-menu">
+                    {{-- <a href="#" class="option-menu">
                         <span class="material-icons">dashboard</span>
                         <h3>Dashboard</h3>
                     </a>
                     <a href="#" class="option-menu">
                         <span class="material-icons">person</span>
                         <h3>Clientes</h3>
-                    </a>
-                    <li class="dropdown-sidebar">
-                        <a href="#" class=" option-menu">
-                            <span class="material-icons">settings</span>
-                            <h3>Cheques</h3>
-                        </a>
-                        <ul class="sub-menu animate__animated animate__faster animate__fadeIn">
-                            <li><a href="{{ url('/checks') }}">Cheques</a></li>
-                            <li><a href="{{ url('/suppliers') }}">Proveedores</a></li>
-                            <li><a href="{{ url('/documents') }}">Documentos</a></li>
-                            <li><a href="{{ url('/banks') }}">Bancos</a></li>
-                        </ul>
-                    </li>
+                    </a> --}}
+                    @if (auth()->hasRole('Administrador') || auth()->hasRole('Tesorería'))
+                        <li class="dropdown-sidebar">
+                            <a href="#" class=" option-menu">
+                                <span class="material-icons">settings</span>
+                                <h3>Cheques</h3>
+                            </a>
+                            <ul class="sub-menu animate__animated animate__faster animate__fadeIn">
+                                <li><a href="{{ url('/checks') }}">Cheques</a></li>
+                                <li><a href="{{ url('/suppliers') }}">Proveedores</a></li>
+                                <li><a href="{{ url('/documents') }}">Documentos</a></li>
+                                <li><a href="{{ url('/banks') }}">Bancos</a></li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <a href="#" class="option-menu">
+                    @if (auth()->hasRole('Administrador') || auth()->hasRole('Tesorería'))
+                        <li class="dropdown-sidebar">
+                            <a href="#" class=" option-menu">
+                                <span class="material-icons">settings</span>
+                                <h3>Cuenta corriente</h3>
+                            </a>
+                            <ul class="sub-menu animate__animated animate__faster animate__fadeIn">
+                                <li><a href="{{ url('/accounts') }}">Cuentas</a></li>
+                                <li><a href="{{ url('/receipts') }}">Recibos</a></li>
+                                <li><a href="{{ url('/reportTributes') }}">Reporte de tributos</a></li>
+                                {{-- <li><a href="{{ url('/banks') }}">Bancos</a></li> --}}
+                            </ul>
+                        </li>
+                    @endif
+
+                    {{-- <a href="#" class="option-menu">
                         <span class="material-icons">receipt_long</span>
                         <h3>Ordenes</h3>
                     </a>
                     <a href="#" class="option-menu">
                         <span class="material-icons">settings</span>
                         <h3>Ajustes</h3>
-                    </a>
+                    </a> --}}
                     <a href="{{ route('logout') }}" class="option-menu"
                         onclick="event.preventDefault();document.getElementById('logout-form').submit();">
                         <span class="material-icons">logout</span>
@@ -107,7 +124,7 @@
                             </a>
                         </div>
                         <div class="title">
-                            <h1>ERP Alpha</h1>
+                            <h1>{{ env('APP_NAME') }}</h1>
                         </div>
                     </div>
                     <div class="nav-right">

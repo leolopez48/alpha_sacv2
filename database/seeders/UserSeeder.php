@@ -17,37 +17,13 @@ class UserSeeder extends Seeder
     public function run()
     {
         $roleAdmin = Role::findOrFail(1);
-        $roleUser = Role::findOrFail(2);
-
-        $admin = User::create([
-            'id' => 1,
-            'name' => 'Leonel',
-            'last_name' => 'Lopez',
-            'dui' => '12345678-1',
-            'email' => 'leonellopez647@gmail.com',
-            'password' => Hash::make('Leonel23'),
-            'name' => 'Leonel',
-            'email_verified_at' => now(),
-        ]);
-        $admin->assignRole($roleAdmin);
+        $roleTesoreria = Role::findOrFail(2);
+        $roleCuenta = Role::findOrFail(3);
 
         $user = User::create([
-            'id' => 2,
-            'name' => 'Leonel',
-            'last_name' => 'Lopez',
-            'dui' => '12345678-2',
-            'email' => 'lopezleonel191@gmail.com',
-            'password' => Hash::make('Leonel23'),
-            'name' => 'Leonel',
-            'email_verified_at' => now(),
-        ]);
-        $user->assignRole($roleUser);
-
-        $user = User::create([
-            'id' => 3,
-            'name' => 'admin',
-            'last_name' => 'admin',
-            'dui' => '02475605-7',
+            'name' => 'Administrador',
+            'last_name' => 'Administrador',
+            'dui' => '12345678-9',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('12345678'),
             'name' => 'William',
