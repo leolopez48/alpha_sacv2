@@ -1,16 +1,5 @@
 <template>
   <div data-app>
-    <alert-time-out
-      :redirect="redirectSessionFinished"
-      @redirect="updateTimeOut($event)"
-    />
-    <!-- <alert
-      :text="textAlert"
-      :event="alertEvent"
-      :show="showAlert"
-      @show-alert="updateAlert($event)"
-      class="mb-2"
-    /> -->
     <v-data-table
       :headers="headers"
       :items="recordsFiltered"
@@ -256,6 +245,7 @@ import lib from "../../libs/function";
 import { required, minLength, maxLength } from "vuelidate/lib/validators";
 import AddAccounts from "./AddAccounts.vue";
 import moment from "moment";
+import ui from "../../libs/ui";
 
 export default {
   components: { AddAccounts },
@@ -308,6 +298,8 @@ export default {
     actualPage: 1,
     skip: 0,
     take: 50,
+    timeSearch: 0,
+    search: "",
   }),
 
   watch: {
@@ -397,11 +389,7 @@ export default {
       ];
 
       const res = await Promise.all(requests).catch((error) => {
-        // this.updateAlert(true, "No fue posible obtener los registros.", "fail");
-        // this.redirectSessionFinished = lib.verifySessionFinished(
-        //   error.response.status,
-        //   401
-        // );
+        ui.alert("Registro no pudieron ser obtenidos correctamente.", "error");
       });
 
       this.records = res[0].data.recibos;
@@ -426,24 +414,12 @@ export default {
       const res = await reciboApi
         .delete(`/${this.editedItem.id}`)
         .catch((error) => {
-          //   this.updateAlert(
-          //     true,
-          //     "No fue posible eliminar el registros.",
-          //     "fail"
-          //   );
           this.close();
-          this.redirectSessionFinished = lib.verifySessionFinished(
-            error.response.status,
-            419
-          );
+          ui.alert("Registro no pudo ser eliminado correctamente.", "error");
         });
 
       if (res.data.status == "success") {
-        this.redirectSessionFinished = lib.verifySessionFinished(
-          res.status,
-          200
-        );
-        // this.updateAlert(true, "Registro eliminado.", "success");
+        ui.alert("Registro eliminado correctamente.");
       }
 
       this.initialize();
@@ -469,11 +445,9 @@ export default {
     async save() {
       this.$v.$touch();
       if (this.$v.$invalid) {
-        console.log("Error");
-        // this.updateAlert(true, "Campos obligatorios.", "fail");
+        ui.alert("Campos obligatorios.", "error");
         return;
       }
-      //   console.log("Good");
 
       if (this.editedIndex > -1) {
         const edited = Object.assign(
@@ -484,47 +458,24 @@ export default {
         const res = await reciboApi
           .put(`/${this.editedItem.id}`, this.editedItem)
           .catch((error) => {
-            // this.updateAlert(
-            //   true,
-            //   "No fue posible actualizar el registro.",
-            //   "fail"
-            // );
-
-            this.redirectSessionFinished = lib.verifySessionFinished(
-              error.response.status,
-              419
+            ui.alert(
+              "Registro no pudo ser actualizado correctamente.",
+              "error"
             );
           });
 
         if (res.data.status == "success") {
-          this.redirectSessionFinished = lib.verifySessionFinished(
-            res.status,
-            200
-          );
-          //   this.updateAlert(true, "Registro actualizado.", "success");
+          ui.alert("Registro actualizado correctamente.");
         }
       } else {
         const res = await reciboApi
           .post(null, this.editedItem)
           .catch((error) => {
-            // this.updateAlert(true, "No fue posible crear el registro.", "fail");
-            this.close();
-            this.redirectSessionFinished = lib.verifySessionFinished(
-              error.response.status,
-              419
-            );
+            ui.alert("Registro no pudo ser almacenado correctamente.", "error");
           });
 
         if (res.data.status == "success") {
-          this.redirectSessionFinished = lib.verifySessionFinished(
-            res.status,
-            200
-          );
-          //   this.updateAlert(
-          //     true,
-          //     "Registro almacenado correctamente.",
-          //     "success"
-          //   );
+          ui.alert("Registro almacenado correctamente.");
         }
       }
 
@@ -533,26 +484,28 @@ export default {
       return;
     },
 
-    searchValue() {
+    async searchValue() {
       this.recordsFiltered = [];
 
-      if (this.search != "") {
-        this.records.forEach((record) => {
-          let searchConcat = "";
-          for (let i = 0; i < record.fecha_registro.length; i++) {
-            searchConcat += record.fecha_registro[i].toUpperCase();
-            if (
-              searchConcat === this.search.toUpperCase() &&
-              !this.recordsFiltered.some((rec) => rec == record)
-            ) {
-              this.recordsFiltered.push(record);
-            }
-          }
-        });
-        return;
-      }
+      this.timeSearch = setTimeout(async () => {
+        const res = await reciboApi
+          .get(null, {
+            params: {
+              skip: this.skip,
+              take: this.take,
+              search: this.search,
+            },
+          })
+          .catch((error) => {
+            ui.alert(
+              "Registro no pudieron ser obtenidos correctamente.",
+              "error"
+            );
+          });
 
-      this.recordsFiltered = this.records;
+        this.recordsFiltered = res.data.recibos;
+        this.total = res.data.total;
+      }, 1000);
     },
 
     updateReceipts(event) {
@@ -561,9 +514,6 @@ export default {
     },
 
     printReceipt(item) {
-      //   this.editedItem = Object.assign({}, item);
-      //   this.dialogPrint = true;
-      //   console.log(item);
       window.open(`/downloadReceipt/${item.id}`);
     },
 
@@ -588,14 +538,9 @@ export default {
           params: { skip: this.skip, take: this.take },
         })
         .catch((error) => {
-          this.redirectSessionFinished = lib.verifySessionFinished(
-            res.status,
-            200
-          );
-          this.updateAlert(
-            true,
-            "Registro almacenado correctamente.",
-            "success"
+          ui.alert(
+            "Los registro no pudieron ser obtenidos correctamente.",
+            "error"
           );
         });
 
@@ -603,8 +548,6 @@ export default {
       this.recordsFiltered = res.data.users;
 
       this.search = "";
-
-      this.$v.editedItem.rol.$model = "Postulante";
     },
 
     updatePagination(pagination) {

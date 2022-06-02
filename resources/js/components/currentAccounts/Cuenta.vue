@@ -1,16 +1,5 @@
 <template>
   <div data-app>
-    <alert-time-out
-      :redirect="redirectSessionFinished"
-      @redirect="updateTimeOut($event)"
-    />
-    <alert
-      :text="textAlert"
-      :event="alertEvent"
-      :show="showAlert"
-      @show-alert="updateAlert($event)"
-      class="mb-2"
-    />
     <v-data-table
       :headers="headers"
       :items="recordsFiltered"
@@ -176,7 +165,7 @@
 
 <script>
 import cuentaApi from "../../apis/cuentaApi";
-import lib from "../../libs/function";
+import ui from "../../libs/ui";
 import { required, minLength, maxLength } from "vuelidate/lib/validators";
 
 export default {
@@ -255,11 +244,7 @@ export default {
       this.recordsFiltered = [];
 
       const res = await cuentaApi.get().catch((error) => {
-        this.updateAlert(true, "No fue posible obtener los registros.", "fail");
-        this.redirectSessionFinished = lib.verifySessionFinished(
-          error.response.status,
-          401
-        );
+        ui.alert("No fue posible obtener los registros.", "error");
       });
 
       this.records = res.data.cuentas;
@@ -283,24 +268,11 @@ export default {
       const res = await cuentaApi
         .delete(`/${this.editedItem.id}`)
         .catch((error) => {
-          this.updateAlert(
-            true,
-            "No fue posible eliminar el registros.",
-            "fail"
-          );
-          this.close();
-          this.redirectSessionFinished = lib.verifySessionFinished(
-            error.response.status,
-            419
-          );
+          ui.alert("Registro no pudo ser eliminado correctamente.", "error");
         });
 
       if (res.data.status == "success") {
-        this.redirectSessionFinished = lib.verifySessionFinished(
-          res.status,
-          200
-        );
-        this.updateAlert(true, "Registro eliminado.", "success");
+        ui.alert("Registro eliminado correctamente.");
       }
 
       this.initialize();
@@ -339,47 +311,24 @@ export default {
         const res = await cuentaApi
           .put(`/${this.editedItem.id}`, this.editedItem)
           .catch((error) => {
-            this.updateAlert(
-              true,
-              "No fue posible actualizar el registro.",
-              "fail"
-            );
-
-            this.redirectSessionFinished = lib.verifySessionFinished(
-              error.response.status,
-              419
+            ui.alert(
+              "Registro no pudo ser actualizado correctamente.",
+              "error"
             );
           });
 
         if (res.data.status == "success") {
-          this.redirectSessionFinished = lib.verifySessionFinished(
-            res.status,
-            200
-          );
-          this.updateAlert(true, "Registro actualizado.", "success");
+          ui.alert("Registro actualizado correctamente.");
         }
       } else {
         const res = await cuentaApi
           .post(null, this.editedItem)
           .catch((error) => {
-            this.updateAlert(true, "No fue posible crear el registro.", "fail");
-            this.close();
-            this.redirectSessionFinished = lib.verifySessionFinished(
-              error.response.status,
-              419
-            );
+            ui.alert("Registro no pudo ser almacenado correctamente.", "error");
           });
 
         if (res.data.status == "success") {
-          this.redirectSessionFinished = lib.verifySessionFinished(
-            res.status,
-            200
-          );
-          this.updateAlert(
-            true,
-            "Registro almacenado correctamente.",
-            "success"
-          );
+          ui.alert("Registro almacenado correctamente.");
         }
       }
 
@@ -408,16 +357,6 @@ export default {
       }
 
       this.recordsFiltered = this.records;
-    },
-
-    updateAlert(show = false, text = "Alerta", event = "success") {
-      this.textAlert = text;
-      this.alertEvent = event;
-      this.showAlert = show;
-    },
-
-    updateTimeOut(event) {
-      this.redirectSessionFinished = event;
     },
   },
 };

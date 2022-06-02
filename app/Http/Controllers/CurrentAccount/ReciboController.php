@@ -23,10 +23,24 @@ class ReciboController extends Controller
     {
         $skip = $request->skip;
         $limit = $request->take - $skip; // the limit
+        $recibos = [];
 
-        $recibos = Recibo::skip($skip)->take($limit)
-            ->orderBy('id', 'desc')
-            ->get();
+        if (isset($request->search)) {
+            $search = '%'.$request->search.'%';
+
+            $recibos = Recibo::skip($skip)->take($limit)
+                ->orderBy('id', 'desc')
+                ->where('nombres', 'like', $search)
+                ->orWhere('apellidos', 'like', $search)
+                ->orWhere('dui', 'like', $search)
+                ->get();
+        } else {
+            $recibos = Recibo::skip($skip)->take($limit)
+                ->orderBy('id', 'desc')
+                ->get();
+        }
+
+
 
         foreach ($recibos as $recibo) {
             // $recibo->nombre_cuenta = Cuenta::find($recibo->cuenta_id);
@@ -138,9 +152,39 @@ class ReciboController extends Controller
      */
     public function update(Request $request)
     {
-        $data = Encrypt::decryptArray($request->all(), 'id');
+        $dataRequest = $request->except('detail_receipts');
+        $dataRequest = Encrypt::decryptArray($dataRequest, 'id');
 
-        Recibo::where('id', $data)->update($data);
+        $details = $request->detail_receipts;
+
+        DetalleRecibo::where('recibo_id', $dataRequest['id'])->delete();
+
+        foreach ($details as $detail) {
+            // dd($data['id']);
+            $data = [];
+
+            if ($detail['nombre_cuenta'] == 'FIESTA') {
+                $data = [
+                    'recibo_id' => $dataRequest['id'],
+                    'cantidad' => $detail['cantidad'],
+                    'subtotal' => number_format($detail['subtotal'], 2),
+                ];
+                DetalleRecibo::create($data);
+            } else {
+                $cuenta = Cuenta::where('nombre_cuenta', $detail['nombre_cuenta'])->first();
+                $cuenta_id = $cuenta->id;
+
+                $data = [
+                    'recibo_id' => $dataRequest['id'],
+                    'cuenta_id' => $cuenta_id,
+                    'cantidad' => $detail['cantidad'],
+                    'subtotal' => number_format($detail['subtotal'], 2),
+                ];
+                DetalleRecibo::create($data);
+            }
+        }
+
+        Recibo::where('id', $dataRequest)->update($dataRequest);
         return response()->json([
             "status"=>"success",
             "message"=>"Registro modificado correctamente."
@@ -170,6 +214,7 @@ class ReciboController extends Controller
 
         $receipts = Recibo::where("recibo.id", $id)->join('detalles_recibo', 'recibo.id', '=', 'detalles_recibo.recibo_id')
         ->select('recibo.*', 'detalles_recibo.*')
+        ->where('detalles_recibo.deleted_at', '=', null)
         ->get();
 
         try {
@@ -281,6 +326,7 @@ class ReciboController extends Controller
                         $text .= "$ ";
                         $subtotal = DetalleRecibo::where('cuenta_id', $accounts[$r]->id)->where('fecha_registro', '>=', $dateStart)
                         ->where('fecha_registro', '<=', $dateEnd)
+                        ->where('detalles_recibo.deleted_at', '=', null)
                         ->join('recibo', 'recibo.id', '=', 'detalles_recibo.recibo_id')
                         ->sum('subtotal');
                         $text = $text.number_format($subtotal, 2);
@@ -324,6 +370,7 @@ class ReciboController extends Controller
 
         $fiestas = DetalleRecibo::where('cuenta_id', '=', null)->where('fecha_registro', '>=', $dateStart)
         ->where('fecha_registro', '<=', $dateEnd)
+        ->where('detalles_recibo.deleted_at', '=', null)
         ->join('recibo', 'recibo.id', '=', 'detalles_recibo.recibo_id')
         ->sum('subtotal');
         $total += $fiestas;
