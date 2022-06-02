@@ -26,7 +26,6 @@ class UserSeeder extends Seeder
             'dui' => '12345678-9',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('12345678'),
-            'name' => 'William',
             'email_verified_at' => now(),
         ]);
         $user->assignRole($roleAdmin);
