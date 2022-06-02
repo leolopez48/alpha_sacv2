@@ -40,10 +40,7 @@ class ReciboController extends Controller
                 ->get();
         }
 
-
-
         foreach ($recibos as $recibo) {
-            // $recibo->nombre_cuenta = Cuenta::find($recibo->cuenta_id);
             $recibo->detail_receipts = DetalleRecibo::where('recibo_id', $recibo->id)->get();
 
             foreach ($recibo->detail_receipts as $detail) {
