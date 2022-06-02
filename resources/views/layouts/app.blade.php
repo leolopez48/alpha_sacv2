@@ -54,7 +54,8 @@
                         <span class="material-icons">person</span>
                         <h3>Clientes</h3>
                     </a> --}}
-                    @if (auth()->hasRole('Administrador') || auth()->hasRole('Tesorería'))
+                    @if (auth()->user()->hasRole('Administrador') == 'Administrador' ||
+                        auth()->user()->hasRole('Tesorería') == 'Tesorería')
                         <li class="dropdown-sidebar">
                             <a href="#" class=" option-menu">
                                 <span class="material-icons">settings</span>
@@ -69,7 +70,8 @@
                         </li>
                     @endif
 
-                    @if (auth()->hasRole('Administrador') || auth()->hasRole('Tesorería'))
+                    @if (auth()->user()->hasRole('Administrador') == 'Administrador' ||
+                        auth()->user()->hasRole('Cuenta corriente') == 'Cuenta corriente')
                         <li class="dropdown-sidebar">
                             <a href="#" class=" option-menu">
                                 <span class="material-icons">settings</span>
