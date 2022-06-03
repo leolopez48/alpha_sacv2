@@ -73,7 +73,7 @@ class ReciboController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->total);
+        // dd($request->total);
         $data = [
             'fecha_registro' => date('Y-m-d h:m', strtotime($request->fecha_registro)),
             'dui' => $request->dui,
@@ -81,7 +81,7 @@ class ReciboController extends Controller
             'apellidos' => $request->apellidos,
             'direccion' => $request->direccion,
             'concepto' => $request->concepto,
-            'total' => $request->total,
+            'total' => number_format($request->total, 2, '', '.'),
         ];
         $recibo = Recibo::create($data);
 
@@ -105,7 +105,7 @@ class ReciboController extends Controller
                 $data = [
                         'recibo_id' => $recibo_id,
                         'cantidad' => $detail['cantidad'],
-                        'subtotal' => number_format($detail['subtotal'], 2),
+                        'subtotal' => number_format($detail['subtotal'], 2, '', '.'),
                     ];
                 DetalleRecibo::create($data);
             } else {
@@ -116,7 +116,7 @@ class ReciboController extends Controller
                     'recibo_id' => $recibo_id,
                     'cuenta_id' => $cuenta_id,
                     'cantidad' => $detail['cantidad'],
-                    'subtotal' => number_format($detail['subtotal'], 2),
+                    'subtotal' => number_format($detail['subtotal'], 2, '', '.'),
                 ];
                 DetalleRecibo::create($data);
             }
