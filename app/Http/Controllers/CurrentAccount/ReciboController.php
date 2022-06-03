@@ -234,20 +234,21 @@ class ReciboController extends Controller
 
                 if ($i < 13) {
                     try {
-                        $template->setValue('account_code'.($i+1), "");
                         if (!empty($receipts[$i]->cuenta_id)) {
                             $account = Cuenta::where('id', $receipts[$i]->cuenta_id)->first();
                             $template->setValue('account_name'.($i+1), $account->nombre_cuenta);
                             $j++;
+                            $template->setValue('codigo'.($i+1), $account->codigo);
                         } else {
                             if ($j < count($receipts)) {
                                 $template->setValue('account_name'.($i+1), "FIESTA");
+                                $template->setValue('codigo'.($i+1), "1411");
                                 $j++;
                             }
                         }
                         $template->setValue('subtotal'.($i+1), $receipts[$i]->subtotal);
                     } catch (\Throwable $th) {
-                        $template->setValue('account_code'.($i+1), "");
+                        $template->setValue('codigo'.($i+1), "");
                         $template->setValue('account_name'.($i+1), "");
                         $template->setValue('subtotal'.($i+1), "");
                     }
@@ -312,7 +313,7 @@ class ReciboController extends Controller
                 switch ($c) {
                     case 0:
                         $width = 4000;
-                        $text = $r+1;
+                        $text = $accounts[$r]->codigo;
                     break;
                     case 1:
                         $width = 8000;
