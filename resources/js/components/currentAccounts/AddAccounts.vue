@@ -172,7 +172,7 @@ export default {
           this.newDetail.valor = account.valor;
           this.newDetail.subtotal = Number.parseFloat(
             account.valor * this.newDetail.cantidad
-          );
+          ).toFixed(2);
 
           if (account.apply_parties == 1) {
             let fiesta = {
@@ -188,7 +188,7 @@ export default {
             this.total += parseFloat(fiesta.subtotal).toFixed(2);
           }
 
-          this.total += parseFloat(this.newDetail.subtotal, 2).toFixed(2);
+          this.total += parseFloat(this.newDetail.subtotal).toFixed(2);
         }
       });
 
