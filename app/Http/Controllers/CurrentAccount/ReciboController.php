@@ -73,7 +73,7 @@ class ReciboController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->total);
+        dd($request->total);
         $data = [
             'fecha_registro' => date('Y-m-d h:m', strtotime($request->fecha_registro)),
             'dui' => $request->dui,
@@ -81,7 +81,7 @@ class ReciboController extends Controller
             'apellidos' => $request->apellidos,
             'direccion' => $request->direccion,
             'concepto' => $request->concepto,
-            'total' => number_format($request->total, 2),
+            'total' => $request->total,
         ];
         $recibo = Recibo::create($data);
 
