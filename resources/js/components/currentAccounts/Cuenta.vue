@@ -56,10 +56,25 @@
                     <!-- Name -->
                     <v-col cols="12" sm="12" md="12">
                       <base-input
+                        label="Código"
+                        v-model="$v.editedItem.codigo.$model"
+                        :validation="$v.editedItem.codigo"
+                        validationTextType="none"
+                        :validationsInput="{
+                          required: true,
+                          minLength: true,
+                          maxLength: true,
+                        }"
+                      />
+                    </v-col>
+                    <!-- Name -->
+                    <!-- Name -->
+                    <v-col cols="12" sm="12" md="12">
+                      <base-input
                         label="Nombre"
                         v-model="$v.editedItem.nombre_cuenta.$model"
                         :validation="$v.editedItem.nombre_cuenta"
-                        validationTextType="default"
+                        validationTextType="none"
                         :validationsInput="{
                           required: true,
                           minLength: true,
@@ -174,6 +189,7 @@ export default {
     dialog: false,
     dialogDelete: false,
     headers: [
+      { text: "CODIGO", value: "codigo" },
       { text: "NOMBRE", value: "nombre_cuenta" },
       { text: "VALOR", value: "valor" },
       { text: "ACCIONES", value: "actions", sortable: false },
@@ -182,11 +198,13 @@ export default {
     recordsFiltered: [],
     editedIndex: -1,
     editedItem: {
+      codigo: "",
       nombre_cuenta: "",
       valor: "",
       apply_parties: true,
     },
     defaultItem: {
+      codigo: "",
       nombre_cuenta: "",
       valor: "",
       apply_parties: true,
@@ -201,6 +219,11 @@ export default {
   //Validations
   validations: {
     editedItem: {
+      codigo: {
+        required,
+        minLength: minLength(1),
+        maxLength: maxLength(255),
+      },
       nombre_cuenta: {
         required,
         minLength: minLength(1),
