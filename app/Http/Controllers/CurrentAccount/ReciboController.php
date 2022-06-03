@@ -81,7 +81,7 @@ class ReciboController extends Controller
             'apellidos' => $request->apellidos,
             'direccion' => $request->direccion,
             'concepto' => $request->concepto,
-            'total' => number_format($request->total, 2, '', '.'),
+            'total' => number_format($request->total, 2, '.', ''),
         ];
         $recibo = Recibo::create($data);
 
@@ -105,7 +105,7 @@ class ReciboController extends Controller
                 $data = [
                         'recibo_id' => $recibo_id,
                         'cantidad' => $detail['cantidad'],
-                        'subtotal' => number_format($detail['subtotal'], 2, '', '.'),
+                        'subtotal' => number_format($detail['subtotal'], 2, '.', ''),
                     ];
                 DetalleRecibo::create($data);
             } else {
@@ -116,7 +116,7 @@ class ReciboController extends Controller
                     'recibo_id' => $recibo_id,
                     'cuenta_id' => $cuenta_id,
                     'cantidad' => $detail['cantidad'],
-                    'subtotal' => number_format($detail['subtotal'], 2, '', '.'),
+                    'subtotal' => number_format($detail['subtotal'], 2, '.', ''),
                 ];
                 DetalleRecibo::create($data);
             }
