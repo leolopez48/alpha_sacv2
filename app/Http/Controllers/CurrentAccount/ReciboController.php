@@ -73,6 +73,7 @@ class ReciboController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->total);
         $data = [
             'fecha_registro' => date('Y-m-d h:m', strtotime($request->fecha_registro)),
             'dui' => $request->dui,
