@@ -185,7 +185,7 @@ export default {
             };
 
             this.editedItem.detail_receipts.push(fiesta);
-            this.total += parseFloat(fiesta.subtotal);
+            this.total += parseFloat(fiesta.subtotal).toFixed(2);
           }
 
           this.total += parseFloat(this.newDetail.subtotal, 2).toFixed(2);
