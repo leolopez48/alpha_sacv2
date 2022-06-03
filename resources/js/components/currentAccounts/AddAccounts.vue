@@ -188,7 +188,7 @@ export default {
             this.total += parseFloat(fiesta.subtotal);
           }
 
-          this.total += this.newDetail.subtotal;
+          this.total += parseFloat(this.newDetail.subtotal, 2).toFixed(2);
         }
       });
 
