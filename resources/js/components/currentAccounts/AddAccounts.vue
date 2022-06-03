@@ -179,12 +179,13 @@ export default {
               nombre_cuenta: `FIESTA`,
               valor: this.fiesta,
               cantidad: this.newDetail.cantidad,
-              subtotal:
-                parseFloat(this.newDetail.subtotal).toFixed(2) * this.fiesta,
+              subtotal: parseFloat(
+                parseFloat(this.newDetail.subtotal).toFixed(3) * this.fiesta
+              ).toFixed(2),
             };
 
             this.editedItem.detail_receipts.push(fiesta);
-            this.total += fiesta.subtotal;
+            this.total += parseFloat(fiesta.subtotal);
           }
 
           this.total += this.newDetail.subtotal;
